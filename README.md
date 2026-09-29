@@ -36,26 +36,26 @@ A lightweight, local network web application that turns any smartphone into a re
 
 ---
 
-### 💜 Khaled (`GameScarf4`) — Frontend & Mobile UI/UX Lead
+### 💜 Khaled & Koumait — Frontend & Mobile UI/UX
 **المسؤولية:** تصميم وبرمجة واجهة الويب للجوال (HTML, CSS, JavaScript) لتكون مريحة وسريعة الاستجابة للمس.
 
-- [ ] **Task 1: Mobile UI Structure (`index.html`)**
-  - تصميم واجهة متجاوبة ومريحة للجوال مع شريط تنقل سفلي أو علوي يحتوي على 4 أقسام:
+- [x] **Task 1: Mobile UI Structure (`frontend/index.html`)**
+  - تصميم واجهة متجاوبة ومريحة للجوال مع شريط تنقل سفلي يحتوي على 4 أقسام:
     1. 🖱️ **Trackpad (الماوس)**
     2. 📁 **Files (الملفات)**
     3. 🎵 **Media & Power (الميديا والطاقة)**
     4. 📊 **Stats (مراقبة الجهاز)**
-- [ ] **Task 2: Virtual Touchpad (`remote.js`)**
-  - إنشاء مساحة لمس (Touch Area) تتعقب حركة الإصبع (`touchmove`) وترسل الإحداثيات للسيرفر فورياً.
-  - إضافة أزرار مخصصة لـ Left Click و Right Click.
-- [ ] **Task 3: File Manager UI**
+- [x] **Task 2: Virtual Touchpad (`frontend/js/remote.js`)**
+  - إنشاء مساحة لمس (Touch Area) تتعقب حركة الإصبع وترسل الإحداثيات للسيرفر فورياً.
+  - إضافة أزرار مخصصة لـ Left Click و Right Click وسكرول.
+- [x] **Task 3: File Manager UI (`frontend/index.html`, `frontend/js/remote.js`)**
   - زر سهل لسحب واختيار الصور والفيديوهات من الهاتف لرفعها للكمبيوتر.
   - قائمة بالملفات الموجودة على الكمبيوتر مع زر "تنزيل" لكل ملف.
-- [ ] **Task 4: Media & Volume Controller UI**
+- [x] **Task 4: Media & Volume Controller UI (`frontend/css/style.css`, `frontend/js/remote.js`)**
   - أزرار لمس كبيرة وأنيقة للتحكم بالصوت وتخطي المقاطع (YouTube / Spotify).
-  - أزرار سريعة لقفل الجهاز (Lock) بمظهر آمن يمنع الضغط الخاطئ.
-- [ ] **Task 5: Live Hardware Gauges**
-  - تصميم مؤشرات تقدم (Progress Bars) أنيقة تعرض استهلاك الـ CPU والـ RAM بشكل حي ومحدث.
+  - أزرار سريعة لقفل الجهاز (Lock) بمظهر آمن.
+- [x] **Task 5: Live Hardware Gauges (`frontend/index.html`, `frontend/js/remote.js`)**
+  - مؤشرات تقدم أنيقة تعرض استهلاك الـ CPU والـ RAM والـ Disk والبطارية بشكل حي.
 
 ---
 
