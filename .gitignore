@@ -1,0 +1,20 @@
+# Python Virtual Environment
+.venv/
+env/
+venv/
+ENV/
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Uploads directory contents (preserve folder)
+uploads/*
+!uploads/.gitkeep
+
+# Operating System files
+.DS_Store
+Thumbs.db
+desktop.ini
+*.tmp

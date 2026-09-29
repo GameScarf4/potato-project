@@ -1,0 +1,238 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+  <title>Potato Remote Hub 🥔📱</title>
+  <link rel="stylesheet" href="/css/style.css">
+</head>
+<body>
+
+  <!-- App Header -->
+  <header class="app-header">
+    <div class="logo-group">
+      <span class="logo-badge">🥔</span>
+      <h1 class="logo-title">Potato Hub</h1>
+    </div>
+    <div class="status-badge" id="connection-badge">
+      <span class="status-dot" id="status-dot"></span>
+      <span id="status-text">Connected</span>
+    </div>
+  </header>
+
+  <!-- Main Viewports -->
+  <main class="app-main">
+
+    <!-- Tab 1: Virtual Trackpad -->
+    <section class="tab-view active" id="tab-trackpad">
+      <div class="trackpad-container">
+        <!-- Quick Action Bar -->
+        <div class="trackpad-quick-bar">
+          <button class="quick-action-btn" id="btn-type-prompt">⌨️ Type Text</button>
+          <button class="quick-action-btn" id="btn-show-desktop">🖥️ Desktop</button>
+          <button class="quick-action-btn" id="btn-scroll-up">▲ Scroll</button>
+          <button class="quick-action-btn" id="btn-scroll-down">▼ Scroll</button>
+        </div>
+
+        <!-- Touchpad Surface -->
+        <div class="trackpad-surface" id="trackpad-surface">
+          <div class="trackpad-hint">
+            <span>🖱️</span>
+            <div>Slide finger to move mouse</div>
+            <div style="font-size: 11px; opacity: 0.7;">Tap = Left Click • 2 Fingers = Scroll</div>
+          </div>
+        </div>
+
+        <!-- Mouse Buttons -->
+        <div class="mouse-buttons-row">
+          <button class="mouse-btn" id="btn-left-click">Left Click</button>
+          <button class="mouse-btn" id="btn-right-click">Right Click</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 2: Media & System -->
+    <section class="tab-view" id="tab-media">
+      <div class="media-container">
+        <!-- Media Playback -->
+        <div class="control-card">
+          <div class="card-title">Playback Controls</div>
+          <div class="media-btn-grid">
+            <button class="media-btn" data-media="prev">
+              <span>⏮️</span>
+              <span class="label">Previous</span>
+            </button>
+            <button class="media-btn play-btn" data-media="play_pause">
+              <span>⏯️</span>
+              <span class="label">Play/Pause</span>
+            </button>
+            <button class="media-btn" data-media="next">
+              <span>⏭️</span>
+              <span class="label">Next</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Volume Controls -->
+        <div class="control-card">
+          <div class="card-title">Volume Controls</div>
+          <div class="media-btn-grid">
+            <button class="media-btn" data-media="volume_down">
+              <span>🔉</span>
+              <span class="label">Volume -</span>
+            </button>
+            <button class="media-btn" data-media="mute">
+              <span>🔇</span>
+              <span class="label">Mute</span>
+            </button>
+            <button class="media-btn" data-media="volume_up">
+              <span>🔊</span>
+              <span class="label">Volume +</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- System Power -->
+        <div class="control-card">
+          <div class="card-title">Quick Power Actions</div>
+          <div class="power-btn-grid">
+            <button class="power-btn" id="btn-lock-pc">
+              <span>🔒</span> Lock PC
+            </button>
+            <button class="quick-action-btn" id="btn-show-desktop-media" style="height: 52px; font-size: 14px;" onclick="document.getElementById('btn-show-desktop').click()">
+              <span>🖥️</span> Show Desktop
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 3: File Sharing -->
+    <section class="tab-view" id="tab-files">
+      <div class="files-container">
+        <!-- File Upload to PC -->
+        <input type="file" id="file-upload-input" style="display: none;">
+        <div class="upload-box" id="upload-trigger-box">
+          <div class="upload-icon">📤</div>
+          <div class="upload-title">Send to PC</div>
+          <div class="upload-sub">Tap here to choose photos, videos, or files</div>
+        </div>
+
+        <!-- Download Shared Files from PC -->
+        <div class="file-list-card">
+          <div class="file-list-header">
+            <div class="card-title">PC Shared Files</div>
+            <button class="refresh-btn" id="btn-refresh-files">🔄 Refresh</button>
+          </div>
+          <div id="shared-files-list">
+            <!-- Files injected dynamically via remote.js -->
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Tab 4: System Hardware Telemetry -->
+    <section class="tab-view" id="tab-stats">
+      <div class="stats-container">
+        <!-- Telemetry 2x2 Grid -->
+        <div class="stat-grid">
+          <!-- CPU -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>CPU Load</span>
+              <span>⚡</span>
+            </div>
+            <div class="stat-value" id="stat-cpu-val">--%</div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="stat-cpu-bar"></div>
+            </div>
+          </div>
+
+          <!-- Memory -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>RAM Used</span>
+              <span>🧠</span>
+            </div>
+            <div class="stat-value" id="stat-ram-val">--%</div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="stat-ram-bar"></div>
+            </div>
+          </div>
+
+          <!-- Disk -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>C:\ Drive</span>
+              <span>💾</span>
+            </div>
+            <div class="stat-value" id="stat-disk-val">--%</div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="stat-disk-bar"></div>
+            </div>
+          </div>
+
+          <!-- Battery -->
+          <div class="stat-card">
+            <div class="stat-header">
+              <span>Battery</span>
+              <span>🔋</span>
+            </div>
+            <div class="stat-value" id="stat-bat-val">--%</div>
+            <div class="progress-bar-bg">
+              <div class="progress-bar-fill" id="stat-bat-bar"></div>
+            </div>
+          </div>
+        </div>
+
+        <!-- System Information -->
+        <div class="info-list-card">
+          <div class="card-title">PC System Info</div>
+          <div class="info-row">
+            <span class="info-label">Hostname</span>
+            <span class="info-val" id="meta-hostname">--</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Operating System</span>
+            <span class="info-val" id="meta-os">--</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">Memory Installed</span>
+            <span class="info-val" id="meta-ram-detail">--</span>
+          </div>
+          <div class="info-row">
+            <span class="info-label">System Uptime</span>
+            <span class="info-val" id="meta-uptime">--</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Bottom Navigation -->
+  <nav class="bottom-nav">
+    <button class="nav-item active" data-tab="trackpad">
+      <span class="nav-icon">🖱️</span>
+      <span class="nav-label">Mouse</span>
+    </button>
+    <button class="nav-item" data-tab="media">
+      <span class="nav-icon">🎵</span>
+      <span class="nav-label">Media</span>
+    </button>
+    <button class="nav-item" data-tab="files">
+      <span class="nav-icon">📁</span>
+      <span class="nav-label">Files</span>
+    </button>
+    <button class="nav-item" data-tab="stats">
+      <span class="nav-icon">📊</span>
+      <span class="nav-label">Stats</span>
+    </button>
+  </nav>
+
+  <!-- Toast Notification -->
+  <div class="toast" id="app-toast"></div>
+
+  <script src="/js/remote.js"></script>
+</body>
+</html>

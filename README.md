@@ -18,20 +18,20 @@ A lightweight, local network web application that turns any smartphone into a re
 ### 🔵 Khaled (`GameScarf4`) — Backend & System Automation Lead
 **المسؤولية:** برمجة السيرفر بلغة Python، التحكم بمؤشر الماوس، الصوت، ونظام رفع وتنزيل الملفات.
 
-- [ ] **Task 1: Server & Network Setup**
+- [x] **Task 1: Server & Network Setup (`backend/app.py`)**
   - إعداد سيرفر Flask وتحديد الـ IP المحلي في الشبكة.
   - توليد وطباعة QR Code في الكونسول لسهولة مسحه بالجوال.
-- [ ] **Task 2: Mouse & Keyboard Controller (`pc_control.py`)**
+- [x] **Task 2: Mouse & Keyboard Controller (`backend/pc_control.py`)**
   - برمجة دوال `pyautogui` لتحريك الماوس عبر الإحداثيات المستلمة من الجوال (`move_rel`).
   - تنفيذ النقرة اليسرى، النقرة اليمنى، والتمرير (Scroll).
-- [ ] **Task 3: Media & System Commands**
+- [x] **Task 3: Media & System Commands (`backend/pc_control.py`)**
   - دوال التحكم بالصوت (رفع، خفض، كتم).
   - دوال تشغيل وإيقاف الميديا (Play / Pause / Next / Prev).
   - أوامر قفل الجهاز (Lock PC) أو النوم (Sleep).
-- [ ] **Task 4: File Transfer Backend**
+- [x] **Task 4: File Transfer Backend (`backend/app.py`)**
   - بناء نقطة نهاية (Endpoint) لاستقبال الملفات المرفوعة من الجوال وحفظها في مجلد `uploads/`.
   - إرسال قائمة بالملفات المتاحة في مجلد `shared/` ليتمكن الجوال من تنزيلها.
-- [ ] **Task 5: PC Telemetry (`system_stats.py`)**
+- [x] **Task 5: PC Telemetry (`backend/system_stats.py`)**
   - استخدام مكتبة `psutil` لقراءة استهلاك المعالج (CPU) والذاكرة (RAM) وإرسالها للجوال في الوقت الفعلي.
 
 ---

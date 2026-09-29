@@ -1,0 +1,7 @@
+🥔 Welcome to Potato Remote Hub!
+==================================
+This file was shared from your PC to your phone.
+Project by Khaled (GameScarf4) & Koumait (koumait).
+
+You can put any movies, photos, songs, or documents into the `shared/` folder on your PC,
+and they will instantly show up on your phone's browser for download!
