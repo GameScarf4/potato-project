@@ -104,92 +104,213 @@ async function checkConnection() {
 }
 
 // -----------------------------------------------------------------------------
-// Tab 1: Virtual Trackpad
+// Tab 1: Virtual Trackpad (High Performance Gesture Engine)
 // -----------------------------------------------------------------------------
+let pendingDx = 0;
+let pendingDy = 0;
+let isSendingMove = false;
+
+let pendingScroll = 0;
+let isSendingScroll = false;
+
 function initTrackpad() {
   const surface = document.getElementById("trackpad-surface");
   if (!surface) return;
 
+  let maxTouches = 0;
+  let touchStartTime = 0;
+  let lastX = 0;
+  let lastY = 0;
+  let totalMoved = 0;
+
+  // Visual touch pointer dot
+  const touchDot = document.createElement("div");
+  touchDot.style.cssText = "position:absolute; width:32px; height:32px; border-radius:50%; background:rgba(0,242,254,0.25); border:2px solid #00f2fe; pointer-events:none; display:none; transform:translate(-50%,-50%); box-shadow:0 0 12px rgba(0,242,254,0.5); z-index:10;";
+  surface.appendChild(touchDot);
+
   surface.addEventListener("touchstart", (e) => {
-    if (e.touches.length === 1) {
-      const touch = e.touches[0];
-      touchStartX = touch.clientX;
-      touchStartY = touch.clientY;
-      lastTouchX = touch.clientX;
-      lastTouchY = touch.clientY;
-      touchStartTime = Date.now();
-      isMoving = false;
+    e.preventDefault();
+    const count = e.touches.length;
+    maxTouches = count;
+    touchStartTime = Date.now();
+    totalMoved = 0;
+
+    if (count === 1) {
+      const t = e.touches[0];
+      const rect = surface.getBoundingClientRect();
+      lastX = t.clientX;
+      lastY = t.clientY;
+
+      touchDot.style.left = `${t.clientX - rect.left}px`;
+      touchDot.style.top = `${t.clientY - rect.top}px`;
+      touchDot.style.display = "block";
+    } else if (count === 2) {
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      lastX = (t1.clientX + t2.clientX) / 2;
+      lastY = (t1.clientY + t2.clientY) / 2;
+      touchDot.style.display = "none";
     }
   }, { passive: false });
 
   surface.addEventListener("touchmove", (e) => {
-    e.preventDefault(); // Stop mobile scroll pull-to-refresh
-    if (e.touches.length === 1) {
-      const touch = e.touches[0];
-      const dx = touch.clientX - lastTouchX;
-      const dy = touch.clientY - lastTouchY;
+    e.preventDefault();
+    const count = e.touches.length;
+    maxTouches = Math.max(maxTouches, count);
 
-      lastTouchX = touch.clientX;
-      lastTouchY = touch.clientY;
+    if (count === 1) {
+      const t = e.touches[0];
+      const dx = t.clientX - lastX;
+      const dy = t.clientY - lastY;
+      lastX = t.clientX;
+      lastY = t.clientY;
 
-      if (Math.abs(dx) > 0.5 || Math.abs(dy) > 0.5) {
-        isMoving = true;
-        sendMouseMove(dx, dy);
+      const rect = surface.getBoundingClientRect();
+      touchDot.style.left = `${t.clientX - rect.left}px`;
+      touchDot.style.top = `${t.clientY - rect.top}px`;
+
+      const dist = Math.hypot(dx, dy);
+      totalMoved += dist;
+
+      if (dist > 0.3) {
+        queueMouseMove(dx, dy);
       }
-    } else if (e.touches.length === 2) {
-      // Two finger scroll
-      const touch = e.touches[0];
-      const dy = touch.clientY - lastTouchY;
-      lastTouchY = touch.clientY;
-      if (Math.abs(dy) > 2) {
-        sendMouseScroll(dy > 0 ? -60 : 60);
+    } else if (count === 2) {
+      const t1 = e.touches[0];
+      const t2 = e.touches[1];
+      const currentY = (t1.clientY + t2.clientY) / 2;
+      const dy = currentY - lastY;
+      lastY = currentY;
+
+      totalMoved += Math.abs(dy);
+      if (Math.abs(dy) > 1.5) {
+        queueMouseScroll(dy > 0 ? -90 : 90);
       }
     }
   }, { passive: false });
 
   surface.addEventListener("touchend", (e) => {
-    const elapsed = Date.now() - touchStartTime;
-    const totalDist = Math.hypot(lastTouchX - touchStartX, lastTouchY - touchStartY);
+    touchDot.style.display = "none";
+    const duration = Date.now() - touchStartTime;
 
-    // If tap was quick and finger didn't move much -> Trigger Left Click!
-    if (elapsed < 250 && totalDist < 8 && !isMoving) {
-      haptic(20);
-      sendMouseClick("left");
+    // When all fingers leave the surface
+    if (e.touches.length === 0) {
+      // Tap detection (brief touch with minimal movement)
+      if (duration < 350 && totalMoved < 18) {
+        if (maxTouches === 1) {
+          // 1 Finger Tap -> Left Click
+          haptic(20);
+          showToast("🖱️ Left Click", 800);
+          sendMouseClick("left");
+        } else if (maxTouches >= 2) {
+          // 2 Fingers Tap -> Right Click
+          haptic(45);
+          showToast("🖱️ Right Click", 800);
+          sendMouseClick("right");
+        }
+      }
+      maxTouches = 0;
+      totalMoved = 0;
     }
+  });
+
+  surface.addEventListener("touchcancel", () => {
+    touchDot.style.display = "none";
+    maxTouches = 0;
+    totalMoved = 0;
   });
 
   // Dedicated mouse buttons
   document.getElementById("btn-left-click")?.addEventListener("click", () => {
     haptic(20);
+    showToast("🖱️ Left Click", 600);
     sendMouseClick("left");
   });
 
   document.getElementById("btn-right-click")?.addEventListener("click", () => {
-    haptic(30);
+    haptic(35);
+    showToast("🖱️ Right Click", 600);
     sendMouseClick("right");
   });
 
   document.getElementById("btn-scroll-up")?.addEventListener("click", () => {
     haptic(10);
-    sendMouseScroll(120);
+    queueMouseScroll(140);
   });
 
   document.getElementById("btn-scroll-down")?.addEventListener("click", () => {
     haptic(10);
-    sendMouseScroll(-120);
+    queueMouseScroll(-140);
   });
 }
 
-async function sendMouseMove(dx, dy) {
-  try {
-    fetch("/api/mouse/move", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ dx, dy }),
-    });
-  } catch (err) {
-    // Ignore network lag drops during rapid motion
+function queueMouseMove(dx, dy) {
+  // Velocity-sensitive acceleration
+  const speed = Math.hypot(dx, dy);
+  const factor = speed > 14 ? 2.5 : (speed > 5 ? 1.8 : 1.3);
+  pendingDx += dx * factor;
+  pendingDy += dy * factor;
+
+  if (!isSendingMove) {
+    sendBufferedMove();
   }
+}
+
+function sendBufferedMove() {
+  if (Math.abs(pendingDx) < 0.2 && Math.abs(pendingDy) < 0.2) {
+    isSendingMove = false;
+    return;
+  }
+  isSendingMove = true;
+  const dx = pendingDx;
+  const dy = pendingDy;
+  pendingDx = 0;
+  pendingDy = 0;
+
+  fetch("/api/mouse/move", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ dx, dy }),
+  })
+    .catch(() => {})
+    .finally(() => {
+      if (Math.abs(pendingDx) >= 0.2 || Math.abs(pendingDy) >= 0.2) {
+        requestAnimationFrame(sendBufferedMove);
+      } else {
+        isSendingMove = false;
+      }
+    });
+}
+
+function queueMouseScroll(amount) {
+  pendingScroll += amount;
+  if (!isSendingScroll) {
+    sendBufferedScroll();
+  }
+}
+
+function sendBufferedScroll() {
+  if (pendingScroll === 0) {
+    isSendingScroll = false;
+    return;
+  }
+  isSendingScroll = true;
+  const amount = pendingScroll;
+  pendingScroll = 0;
+
+  fetch("/api/mouse/scroll", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ amount }),
+  })
+    .catch(() => {})
+    .finally(() => {
+      if (pendingScroll !== 0) {
+        setTimeout(sendBufferedScroll, 40);
+      } else {
+        isSendingScroll = false;
+      }
+    });
 }
 
 async function sendMouseClick(button) {

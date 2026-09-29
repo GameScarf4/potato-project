@@ -133,8 +133,8 @@ def mouse_move():
     data = request.get_json(silent=True) or {}
     dx = float(data.get("dx", 0))
     dy = float(data.get("dy", 0))
-    result = controller.move_mouse(dx, dy)
-    return jsonify(result)
+    controller.move_mouse(dx, dy)
+    return ("", 204)
 
 
 @app.route("/api/mouse/click", methods=["POST"])

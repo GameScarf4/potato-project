@@ -18,24 +18,35 @@ pyautogui.PAUSE = 0.001  # Ultra-low latency for smooth trackpad movement
 class PCController:
     """
     Handles all mouse, keyboard, media, and system-level actions on the PC.
+    Optimized for ultra-low latency with native Windows win32 mouse_event.
     """
 
-    def __init__(self, sensitivity: float = 1.3):
+    def __init__(self, sensitivity: float = 1.4):
         self.sensitivity = sensitivity
+        self.is_windows = sys.platform == "win32"
 
     # -------------------------------------------------------------------------
-    # Mouse Controls
+    # Mouse Controls (Ultra-low latency)
     # -------------------------------------------------------------------------
 
     def move_mouse(self, dx: float, dy: float):
         """
-        Move the mouse relative to its current position.
+        Move the mouse relative to its current position using hardware-level win32 API.
         """
         try:
-            scaled_dx = int(dx * self.sensitivity)
-            scaled_dy = int(dy * self.sensitivity)
-            pyautogui.moveRel(scaled_dx, scaled_dy, _pause=False)
-            return {"status": "success", "action": "move_mouse", "dx": scaled_dx, "dy": scaled_dy}
+            scaled_dx = int(round(dx * self.sensitivity))
+            scaled_dy = int(round(dy * self.sensitivity))
+
+            if scaled_dx == 0 and scaled_dy == 0:
+                return {"status": "success"}
+
+            if self.is_windows:
+                # MOUSEEVENTF_MOVE = 0x0001 (Direct OS hardware message queue)
+                ctypes.windll.user32.mouse_event(0x0001, scaled_dx, scaled_dy, 0, 0)
+            else:
+                pyautogui.moveRel(scaled_dx, scaled_dy, _pause=False)
+
+            return {"status": "success", "dx": scaled_dx, "dy": scaled_dy}
         except Exception as e:
             return {"status": "error", "message": str(e)}
 
@@ -44,12 +55,30 @@ class PCController:
         Perform a mouse click ('left', 'right', 'middle', 'double').
         """
         try:
-            if button == "double":
-                pyautogui.doubleClick(_pause=False)
-            elif button in ("left", "right", "middle"):
-                pyautogui.click(button=button, _pause=False)
+            if self.is_windows:
+                if button == "left":
+                    ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)  # LEFTDOWN
+                    ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)  # LEFTUP
+                elif button == "right":
+                    ctypes.windll.user32.mouse_event(0x0008, 0, 0, 0, 0)  # RIGHTDOWN
+                    ctypes.windll.user32.mouse_event(0x0010, 0, 0, 0, 0)  # RIGHTUP
+                elif button == "middle":
+                    ctypes.windll.user32.mouse_event(0x0020, 0, 0, 0, 0)  # MIDDLEDOWN
+                    ctypes.windll.user32.mouse_event(0x0040, 0, 0, 0, 0)  # MIDDLEUP
+                elif button == "double":
+                    ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)
+                    ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
+                    ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)
+                    ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
+                else:
+                    ctypes.windll.user32.mouse_event(0x0002, 0, 0, 0, 0)
+                    ctypes.windll.user32.mouse_event(0x0004, 0, 0, 0, 0)
             else:
-                pyautogui.click(button="left", _pause=False)
+                if button == "double":
+                    pyautogui.doubleClick(_pause=False)
+                else:
+                    pyautogui.click(button=button, _pause=False)
+
             return {"status": "success", "action": f"click_{button}"}
         except Exception as e:
             return {"status": "error", "message": str(e)}
@@ -59,7 +88,11 @@ class PCController:
         Scroll mouse wheel. Positive = Up, Negative = Down.
         """
         try:
-            pyautogui.scroll(int(amount), _pause=False)
+            if self.is_windows:
+                # MOUSEEVENTF_WHEEL = 0x0800
+                ctypes.windll.user32.mouse_event(0x0800, 0, 0, int(amount), 0)
+            else:
+                pyautogui.scroll(int(amount), _pause=False)
             return {"status": "success", "action": "scroll", "amount": amount}
         except Exception as e:
             return {"status": "error", "message": str(e)}
