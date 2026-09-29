@@ -36,7 +36,7 @@ A lightweight, local network web application that turns any smartphone into a re
 
 ---
 
-### 💜 Koumait (`koumait`) — Frontend & Mobile UI/UX Lead
+### 💜 Khaled (`GameScarf4`) — Frontend & Mobile UI/UX Lead
 **المسؤولية:** تصميم وبرمجة واجهة الويب للجوال (HTML, CSS, JavaScript) لتكون مريحة وسريعة الاستجابة للمس.
 
 - [ ] **Task 1: Mobile UI Structure (`index.html`)**
