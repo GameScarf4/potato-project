@@ -82,7 +82,12 @@ def print_terminal_banner(ip: str, port: int):
         )
         qr.add_data(url)
         qr.make(fit=True)
-        # Print ASCII QR code directly into console
+
+        # 1. Save crisp image file for easy opening on PC screen
+        img = qrcode.make(url)
+        img.save(os.path.join(BASE_DIR, "qr_code.png"))
+
+        # 2. Print ASCII QR code directly into console
         f = io.StringIO()
         qr.print_ascii(out=f, invert=True)
         f.seek(0)
@@ -92,6 +97,7 @@ def print_terminal_banner(ip: str, port: int):
 
     print("=" * 60)
     print(f"[*] Open {url} on your phone while connected to the same Wi-Fi!")
+    print(f"[*] QR Code image saved to: qr_code.png")
     print("=" * 60 + "\n")
 
 
