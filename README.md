@@ -6,3 +6,6 @@
 # bruh
 # kkkkkkkkk
 #bruh
+my name is khaled
+kkkkkkkk
+my favorite color is blue
